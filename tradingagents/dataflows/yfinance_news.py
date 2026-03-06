@@ -46,6 +46,17 @@ def _extract_article_data(article: dict) -> dict:
         }
 
 
+def _format_article_str(title, publisher, summary="", link=""):
+    """Format a single article's data into a display string."""
+    text = f"### {title} (source: {publisher})\n"
+    if summary:
+        text += f"{summary}\n"
+    if link:
+        text += f"Link: {link}\n"
+    text += "\n"
+    return text
+
+
 def get_news_yfinance(
     ticker: str,
     start_date: str,
@@ -85,12 +96,9 @@ def get_news_yfinance(
                 if not (start_dt <= pub_date_naive <= end_dt + relativedelta(days=1)):
                     continue
 
-            news_str += f"### {data['title']} (source: {data['publisher']})\n"
-            if data["summary"]:
-                news_str += f"{data['summary']}\n"
-            if data["link"]:
-                news_str += f"Link: {data['link']}\n"
-            news_str += "\n"
+            news_str += _format_article_str(
+                data["title"], data["publisher"], data["summary"], data["link"]
+            )
             filtered_count += 1
 
         if filtered_count == 0:
@@ -164,25 +172,10 @@ def get_global_news_yfinance(
 
         news_str = ""
         for article in all_news[:limit]:
-            # Handle both flat and nested structures
-            if "content" in article:
-                data = _extract_article_data(article)
-                title = data["title"]
-                publisher = data["publisher"]
-                link = data["link"]
-                summary = data["summary"]
-            else:
-                title = article.get("title", "No title")
-                publisher = article.get("publisher", "Unknown")
-                link = article.get("link", "")
-                summary = ""
-
-            news_str += f"### {title} (source: {publisher})\n"
-            if summary:
-                news_str += f"{summary}\n"
-            if link:
-                news_str += f"Link: {link}\n"
-            news_str += "\n"
+            data = _extract_article_data(article)
+            news_str += _format_article_str(
+                data["title"], data["publisher"], data["summary"], data["link"]
+            )
 
         return f"## Global Market News, from {start_date} to {curr_date}:\n\n{news_str}"
 
