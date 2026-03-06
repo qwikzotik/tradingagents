@@ -4,9 +4,13 @@ Uses BM25 (Best Matching 25) algorithm for retrieval - no API calls,
 no token limits, works offline with any LLM provider.
 """
 
-from rank_bm25 import BM25Okapi
-from typing import List, Tuple
+import logging
 import re
+from typing import List, Tuple
+
+from rank_bm25 import BM25Okapi
+
+logger = logging.getLogger(__name__)
 
 
 class FinancialSituationMemory:
@@ -135,10 +139,10 @@ if __name__ == "__main__":
         recommendations = matcher.get_memories(current_situation, n_matches=2)
 
         for i, rec in enumerate(recommendations, 1):
-            print(f"\nMatch {i}:")
-            print(f"Similarity Score: {rec['similarity_score']:.2f}")
-            print(f"Matched Situation: {rec['matched_situation']}")
-            print(f"Recommendation: {rec['recommendation']}")
+            logger.info("Match %d:", i)
+            logger.info("Similarity Score: %.2f", rec['similarity_score'])
+            logger.info("Matched Situation: %s", rec['matched_situation'])
+            logger.info("Recommendation: %s", rec['recommendation'])
 
     except (ValueError, IndexError) as e:
-        print(f"Error during recommendation: {str(e)}")
+        logger.error("Error during recommendation: %s", e)
