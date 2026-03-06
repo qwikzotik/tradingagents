@@ -18,6 +18,7 @@ from tradingagents.agents.utils.agent_states import (
     RiskDebateState,
 )
 from tradingagents.dataflows.config import set_config
+from tradingagents.config_validator import validate_config
 
 # Import the new abstract tool methods from agent_utils
 from tradingagents.agents.utils.agent_utils import (
@@ -60,6 +61,9 @@ class TradingAgentsGraph:
         self.debug = debug
         self.config = config or DEFAULT_CONFIG
         self.callbacks = callbacks or []
+
+        # Validate configuration before proceeding
+        validate_config(self.config, selected_analysts)
 
         # Update the interface's config
         set_config(self.config)
