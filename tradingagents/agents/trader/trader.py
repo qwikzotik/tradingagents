@@ -1,6 +1,4 @@
 import functools
-import time
-import json
 from tradingagents.agents.prompts import TRADER_SYSTEM_PROMPT, TRADER_USER_PROMPT
 
 

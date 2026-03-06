@@ -1,6 +1,4 @@
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-import time
-import json
 from tradingagents.agents.utils.agent_utils import get_fundamentals, get_balance_sheet, get_cashflow, get_income_statement, get_insider_transactions
 from tradingagents.agents.prompts import (
     ANALYST_COLLABORATION_PREFIX,
