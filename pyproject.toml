@@ -36,5 +36,15 @@ dependencies = [
 [project.scripts]
 tradingagents = "cli.main:app"
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=6.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
 [tool.setuptools.packages.find]
 include = ["tradingagents*", "cli*"]
