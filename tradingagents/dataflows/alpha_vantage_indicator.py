@@ -1,6 +1,7 @@
 import logging
 
-from .alpha_vantage_common import _make_api_request
+from requests.exceptions import RequestException
+from .alpha_vantage_common import _make_api_request, AlphaVantageRateLimitError
 
 logger = logging.getLogger(__name__)
 
@@ -211,6 +212,6 @@ def get_indicator(
 
         return result_str
 
-    except Exception as e:
+    except (KeyError, ValueError, RequestException, AlphaVantageRateLimitError) as e:
         logger.error("Error getting Alpha Vantage indicator data for %s: %s", indicator, e)
         return f"Error retrieving {indicator} data: {str(e)}"

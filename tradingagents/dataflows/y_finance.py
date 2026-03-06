@@ -4,6 +4,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import yfinance as yf
 import os
+from requests.exceptions import RequestException
 from .stockstats_utils import StockstatsUtils
 
 logger = logging.getLogger(__name__)
@@ -162,7 +163,7 @@ def get_stock_stats_indicators_window(
         for date_str, value in date_values:
             ind_string += f"{date_str}: {value}\n"
         
-    except Exception as e:
+    except (KeyError, ValueError, OSError, RequestException) as e:
         logger.error("Error getting bulk stockstats data: %s", e)
         # Fallback to original implementation if bulk method fails
         ind_string = ""
@@ -198,7 +199,7 @@ def _load_local_stock_data(config, symbol):
         )
         return wrap(data)
     except FileNotFoundError:
-        raise Exception("Stockstats fail: Yahoo Finance data not fetched yet!")
+        raise FileNotFoundError("Stockstats fail: Yahoo Finance data not fetched yet!")
 
 
 def _fetch_online_stock_data(config, symbol):
@@ -294,7 +295,7 @@ def get_stockstats_indicator(
             indicator,
             curr_date,
         )
-    except Exception as e:
+    except (KeyError, ValueError, OSError) as e:
         logger.error("Error getting stockstats indicator data for indicator %s on %s: %s", indicator, curr_date, e)
         return ""
 
@@ -354,7 +355,7 @@ def get_fundamentals(
 
         return header + "\n".join(lines)
 
-    except Exception as e:
+    except (KeyError, ValueError, RequestException) as e:
         return f"Error retrieving fundamentals for {ticker}: {str(e)}"
 
 
@@ -384,7 +385,7 @@ def get_balance_sheet(
         
         return header + csv_string
         
-    except Exception as e:
+    except (KeyError, ValueError, RequestException) as e:
         return f"Error retrieving balance sheet for {ticker}: {str(e)}"
 
 
@@ -414,7 +415,7 @@ def get_cashflow(
         
         return header + csv_string
         
-    except Exception as e:
+    except (KeyError, ValueError, RequestException) as e:
         return f"Error retrieving cash flow for {ticker}: {str(e)}"
 
 
@@ -444,7 +445,7 @@ def get_income_statement(
         
         return header + csv_string
         
-    except Exception as e:
+    except (KeyError, ValueError, RequestException) as e:
         return f"Error retrieving income statement for {ticker}: {str(e)}"
 
 
@@ -468,5 +469,5 @@ def get_insider_transactions(
         
         return header + csv_string
         
-    except Exception as e:
+    except (KeyError, ValueError, RequestException) as e:
         return f"Error retrieving insider transactions for {ticker}: {str(e)}"

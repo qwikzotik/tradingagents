@@ -140,5 +140,5 @@ if __name__ == "__main__":
             print(f"Matched Situation: {rec['matched_situation']}")
             print(f"Recommendation: {rec['recommendation']}")
 
-    except Exception as e:
+    except (ValueError, IndexError) as e:
         print(f"Error during recommendation: {str(e)}")

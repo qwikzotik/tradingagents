@@ -3,6 +3,7 @@
 import yfinance as yf
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from requests.exceptions import RequestException
 
 
 def _extract_article_data(article: dict) -> dict:
@@ -106,7 +107,7 @@ def get_news_yfinance(
 
         return f"## {ticker} News, from {start_date} to {end_date}:\n\n{news_str}"
 
-    except Exception as e:
+    except (KeyError, ValueError, RequestException) as e:
         return f"Error fetching news for {ticker}: {str(e)}"
 
 
@@ -179,5 +180,5 @@ def get_global_news_yfinance(
 
         return f"## Global Market News, from {start_date} to {curr_date}:\n\n{news_str}"
 
-    except Exception as e:
+    except (KeyError, ValueError, RequestException) as e:
         return f"Error fetching global news: {str(e)}"
