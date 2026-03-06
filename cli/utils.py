@@ -1,7 +1,11 @@
 import questionary
 from typing import List, Optional, Tuple, Dict
 
+from rich.console import Console
+
 from cli.models import AnalystType
+
+console = Console()
 
 ANALYST_ORDER = [
     ("Market Analyst", AnalystType.MARKET),
@@ -285,7 +289,7 @@ def select_llm_provider() -> tuple[str, str]:
         exit(1)
     
     display_name, url = choice
-    print(f"You selected: {display_name}\tURL: {url}")
+    console.print(f"You selected: {display_name}\tURL: {url}")
 
     return display_name, url
 
