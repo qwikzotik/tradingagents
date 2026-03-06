@@ -56,17 +56,17 @@ class TestDataflowsConfig:
 
     def setup_method(self):
         """Reset config state before each test."""
-        dataflows_config._config = None
+        dataflows_config._holder._config = None
 
     def test_initialize_config(self):
         dataflows_config.initialize_config()
-        assert dataflows_config._config is not None
+        assert dataflows_config._holder._config is not None
 
     def test_initialize_config_idempotent(self):
         dataflows_config.initialize_config()
-        first = dataflows_config._config
+        first = dataflows_config._holder._config
         dataflows_config.initialize_config()
-        assert dataflows_config._config is first
+        assert dataflows_config._holder._config is first
 
     def test_get_config_returns_copy(self):
         cfg = dataflows_config.get_config()
@@ -74,7 +74,7 @@ class TestDataflowsConfig:
         assert dataflows_config.get_config()["llm_provider"] != "changed"
 
     def test_get_config_auto_initializes(self):
-        assert dataflows_config._config is None
+        assert dataflows_config._holder._config is None
         cfg = dataflows_config.get_config()
         assert cfg is not None
         assert "llm_provider" in cfg
@@ -91,6 +91,6 @@ class TestDataflowsConfig:
         assert "deep_think_llm" in cfg
 
     def test_set_config_initializes_if_needed(self):
-        assert dataflows_config._config is None
+        assert dataflows_config._holder._config is None
         dataflows_config.set_config({"llm_provider": "google"})
         assert dataflows_config.get_config()["llm_provider"] == "google"
