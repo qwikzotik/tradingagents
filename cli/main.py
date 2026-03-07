@@ -575,6 +575,15 @@ def get_user_selections():
         )
         reasoning_effort = ask_openai_reasoning_effort()
 
+    # Step 8: Optional investment thesis
+    console.print(
+        create_question_box(
+            "Step 8: Investment Thesis (Optional)",
+            "Provide a thesis document to frame the analysis (file path or press Enter to skip)",
+        )
+    )
+    thesis_context = get_thesis_input()
+
     return {
         "ticker": selected_ticker,
         "analysis_date": analysis_date,
@@ -586,7 +595,36 @@ def get_user_selections():
         "deep_thinker": selected_deep_thinker,
         "google_thinking_level": thinking_level,
         "openai_reasoning_effort": reasoning_effort,
+        "thesis_context": thesis_context,
     }
+
+
+def get_thesis_input():
+    """Get optional investment thesis from user.
+
+    Returns the thesis text, or empty string if skipped.
+    """
+    thesis_input = typer.prompt("", default="").strip()
+    if not thesis_input:
+        return ""
+
+    # Check if it's a file path
+    thesis_path = Path(thesis_input)
+    if thesis_path.is_file():
+        from tradingagents.graph.thesis_analyzer import ThesisAnalyzer
+        try:
+            analyzer = ThesisAnalyzer(llm=None)  # Only using load_document, no LLM needed
+            text = analyzer.load_document(str(thesis_path))
+            console.print(f"[green]Loaded thesis from:[/green] {thesis_path}")
+            console.print(f"[dim]Document length: {len(text)} characters[/dim]")
+            return text
+        except Exception as e:
+            console.print(f"[red]Error loading file: {e}[/red]")
+            console.print("[yellow]Using input as raw thesis text instead.[/yellow]")
+            return thesis_input
+    else:
+        # Treat as raw thesis text
+        return thesis_input
 
 
 def get_ticker():
@@ -996,6 +1034,11 @@ def run_analysis():
             "System",
             f"Selected analysts: {', '.join(analyst.value for analyst in selections['analysts'])}",
         )
+        if selections.get("thesis_context"):
+            thesis_preview = selections["thesis_context"][:100]
+            if len(selections["thesis_context"]) > 100:
+                thesis_preview += "..."
+            message_buffer.add_message("System", f"Thesis provided: {thesis_preview}")
         update_display(layout, stats_handler=stats_handler, start_time=start_time)
 
         # Update agent status to in_progress for the first analyst
@@ -1011,7 +1054,8 @@ def run_analysis():
 
         # Initialize state and get graph args with callbacks
         init_agent_state = graph.propagator.create_initial_state(
-            selections["ticker"], selections["analysis_date"]
+            selections["ticker"], selections["analysis_date"],
+            thesis_context=selections.get("thesis_context", ""),
         )
         # Pass callbacks to graph config for tool execution tracking
         # (LLM tracking is handled separately via LLM constructor)

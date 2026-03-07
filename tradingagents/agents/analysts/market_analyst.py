@@ -63,6 +63,10 @@ Volume-Based Indicators:
             ]
         )
 
+        thesis_context = state.get("thesis_context", "")
+        if thesis_context:
+            system_message += f"\n\nInvestment Thesis Context: The following investment thesis has been provided to frame your analysis. Consider how {ticker} relates to the themes described:\n{thesis_context}"
+
         prompt = prompt.partial(system_message=system_message)
         prompt = prompt.partial(tool_names=", ".join([tool.name for tool in tools]))
         prompt = prompt.partial(current_date=current_date)

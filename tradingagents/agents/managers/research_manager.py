@@ -9,6 +9,7 @@ def create_research_manager(llm, memory):
         sentiment_report = state["sentiment_report"]
         news_report = state["news_report"]
         fundamentals_report = state["fundamentals_report"]
+        thesis_context = state.get("thesis_context", "")
 
         investment_debate_state = state["investment_debate_state"]
 
@@ -35,7 +36,8 @@ Here are your past reflections on mistakes:
 
 Here is the debate:
 Debate History:
-{history}"""
+{history}
+{f"Investment thesis context framing this analysis: {thesis_context}" if thesis_context else ""}"""
         response = llm.invoke(prompt)
 
         new_investment_debate_state = {

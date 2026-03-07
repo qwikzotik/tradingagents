@@ -183,14 +183,14 @@ class TradingAgentsGraph:
             ),
         }
 
-    def propagate(self, company_name, trade_date):
+    def propagate(self, company_name, trade_date, thesis_context=""):
         """Run the trading agents graph for a company on a specific date."""
 
         self.ticker = company_name
 
         # Initialize state
         init_agent_state = self.propagator.create_initial_state(
-            company_name, trade_date
+            company_name, trade_date, thesis_context=thesis_context
         )
         args = self.propagator.get_graph_args()
 
@@ -248,6 +248,7 @@ class TradingAgentsGraph:
             },
             "investment_plan": final_state["investment_plan"],
             "final_trade_decision": final_state["final_trade_decision"],
+            "thesis_context": final_state.get("thesis_context", ""),
         }
 
         # Save to file
@@ -259,6 +260,51 @@ class TradingAgentsGraph:
             "w",
         ) as f:
             json.dump(self.log_states_dict, f, indent=4)
+
+    def propagate_from_thesis(
+        self, thesis_file_or_text, trade_date, tickers=None
+    ):
+        """Run thesis-aware analysis.
+
+        Args:
+            thesis_file_or_text: Path to a thesis document (.txt, .md, .pdf)
+                or raw thesis text.
+            trade_date: The date to analyze.
+            tickers: Optional list of tickers. If None, extracts from thesis.
+
+        Returns:
+            Dict mapping ticker -> (final_state, decision).
+        """
+        from tradingagents.graph.thesis_analyzer import ThesisAnalyzer
+
+        analyzer = ThesisAnalyzer(self.quick_thinking_llm)
+
+        # Load document or use raw text
+        if os.path.isfile(thesis_file_or_text):
+            doc_text = analyzer.load_document(thesis_file_or_text)
+        else:
+            doc_text = thesis_file_or_text
+
+        # Extract themes and tickers
+        extraction = analyzer.extract_tickers(doc_text, trade_date)
+        thesis_summary = extraction["thesis_summary"]
+
+        if tickers is None:
+            tickers = []
+            for theme in extraction["themes"]:
+                tickers.extend(theme["tickers"])
+            # Deduplicate while preserving order
+            tickers = list(dict.fromkeys(tickers))
+
+        # Run per-ticker analysis with thesis context
+        results = {}
+        for ticker in tickers:
+            final_state, decision = self.propagate(
+                ticker, trade_date, thesis_context=thesis_summary
+            )
+            results[ticker] = (final_state, decision)
+
+        return results
 
     def reflect_and_remember(self, returns_losses):
         """Reflect on decisions and update memory based on returns."""
