@@ -159,6 +159,8 @@ Ranked by expected impact:
    - Anthropic caches only prefixes marked with cache breakpoints, which here would first mean rebuilding prompts as content blocks.
    - Either way, this reorders every agent's prompt, so it lands as its own measured change. Each provider's current caching rules should be confirmed when it is built.
 7. **Resumable batches.** A manifest per thesis run lets a rerun skip finished tickers, on top of per-ticker checkpoints.
+   - **Exhausted credit stops the batch instead of failing every ticker.** Running out of API credit or hitting a spend limit makes every later call fail the same way. On Anthropic that is a 400 "credit balance is too low", or a 429 whose code is `enforced_spend_limit_reached`. The runner recognizes these and stops, keeping the finished tickers so a rerun picks up where it left off. `run_backtest()` instead catches each cell's error and moves on, which would record every remaining ticker as a failure.
+   - **A cost estimate before the deep runs.** Once a few runs have been measured, the CLI shows the expected cost next to the number of deep runs before it starts them.
 
 ## Interfaces
 
@@ -243,9 +245,11 @@ Upstream shipped 426 commits in eight months, and this fork will want to keep ta
 ## Open questions
 
 1. Which provider(s) will you run? That decides the caching approach and how far we can rely on structured output.
-   - **Leaning Claude, through an API key.** A Claude subscription login can't power TradingAgents: Anthropic reserves subscription sign-in for Claude Code and its own apps, and tells developers using the API or Agent SDK to use API keys.
-   - **Max, Ultra and Team plans include monthly API credits** ($100, $200 and up to $500) that an API key can draw on. Pro does not include them.
-   - **Still open:** which plan you're on, and which models each tier should use. Upstream's model picker doesn't list Haiku 5.5 or Sonnet 5.5 yet, but both can be set through config.
+   - **Claude (Max plan): $100 a month of API credits,** used through an API key on a linked Console organization. The subscription sign-in itself can't power TradingAgents, because Anthropic reserves it for Claude Code and its own apps.
+   - **OpenAI (ChatGPT Pro): monthly API credits equal to the Pro tier** ($100, $200 or $500). TradingAgents can also run on the plan's own usage through upstream's "Sign in with ChatGPT" provider, which follows OpenAI's documented flow for open-source apps.
+   - **Google (Google AI Pro): $10 a month of Google Cloud credits** that can be spent on the Gemini API, plus the Gemini API's free tier. Content sent through the free tier is used to improve Google's products.
+   - **Upstream lets each model tier use its own provider.** The quick tier, which makes most of the calls, and the deep tier can draw on different allowances.
+   - **Still open:** which models each tier should use. Upstream's model picker doesn't list Haiku 5.5 or Sonnet 5.5 yet, but both can be set through config.
 2. Do you have a cost or time budget per thesis run? It sets the defaults for N and K.
 3. ~~Should the market and sentiment analysts stay thesis-blind?~~ **Decided: yes.** They see no thesis input, and a test enforces it.
 4. Should the output include losers and underweight ideas?
