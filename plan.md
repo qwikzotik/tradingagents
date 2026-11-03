@@ -118,8 +118,8 @@ Giving the thesis to every agent risks confirmation bias: told the thesis, the a
 
 | Agent | Thesis input | Why |
 |---|---|---|
-| Market (technical) analyst | none | Price action stays independent evidence. |
-| Sentiment analyst | none | Same reason. |
+| Market (technical) analyst | none (decided) | Price action stays independent evidence. |
+| Sentiment analyst | none (decided) | Same reason. |
 | News analyst | signposts only | Points its searches at the thesis's catalysts; it reports what it finds. |
 | Fundamentals analyst | this ticker's linkage claim | Checks the specific claim (for example, data-center revenue share) against the filings. |
 | Bull researcher | brief + link | Makes the thesis case. |
@@ -244,6 +244,6 @@ Upstream shipped 426 commits in eight months, and this fork will want to keep ta
 
 1. Which provider(s) will you run? That decides the caching approach and how far we can rely on structured output.
 2. Do you have a cost or time budget per thesis run? It sets the defaults for N and K.
-3. Should the market and sentiment analysts stay thesis-blind? (Recommended.)
+3. ~~Should the market and sentiment analysts stay thesis-blind?~~ **Decided: yes.** They see no thesis input, and a test enforces it.
 4. Should the output include losers and underweight ideas?
 5. Will you backtest thesis runs? If so, the point-in-time work moves into Phase 1.
