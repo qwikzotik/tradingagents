@@ -243,6 +243,9 @@ Upstream shipped 426 commits in eight months, and this fork will want to keep ta
 ## Open questions
 
 1. Which provider(s) will you run? That decides the caching approach and how far we can rely on structured output.
+   - **Leaning Claude, through an API key.** A Claude subscription login can't power TradingAgents: Anthropic reserves subscription sign-in for Claude Code and its own apps, and tells developers using the API or Agent SDK to use API keys.
+   - **Max, Ultra and Team plans include monthly API credits** ($100, $200 and up to $500) that an API key can draw on. Pro does not include them.
+   - **Still open:** which plan you're on, and which models each tier should use. Upstream's model picker doesn't list Haiku 5.5 or Sonnet 5.5 yet, but both can be set through config.
 2. Do you have a cost or time budget per thesis run? It sets the defaults for N and K.
 3. ~~Should the market and sentiment analysts stay thesis-blind?~~ **Decided: yes.** They see no thesis input, and a test enforces it.
 4. Should the output include losers and underweight ideas?
