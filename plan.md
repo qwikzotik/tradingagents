@@ -246,7 +246,9 @@ Upstream shipped 426 commits in eight months, and this fork will want to keep ta
 
 1. Which provider(s) will you run? That decides the caching approach and how far we can rely on structured output.
    - **Claude (Max plan): $100 a month of API credits,** used through an API key on a linked Console organization. The subscription sign-in itself can't power TradingAgents, because Anthropic reserves it for Claude Code and its own apps.
-   - **OpenAI (ChatGPT Pro): monthly API credits equal to the Pro tier** ($100, $200 or $500). TradingAgents can also run on the plan's own usage through upstream's "Sign in with ChatGPT" provider, which follows OpenAI's documented flow for open-source apps.
+   - **OpenAI (ChatGPT Plus): no API credits.** OpenAI's API-credit benefit covers only Pro and Business plans.
+     - TradingAgents can still run on the Plus plan's own usage through upstream's "Sign in with ChatGPT" provider, which follows OpenAI's documented flow for open-source apps.
+     - That usage is shared with your own ChatGPT and Codex use, and OpenAI doesn't publish how much it covers.
    - **Google (Google AI Pro): $10 a month of Google Cloud credits** that can be spent on the Gemini API, plus the Gemini API's free tier. Content sent through the free tier is used to improve Google's products.
    - **Upstream lets each model tier use its own provider.** The quick tier, which makes most of the calls, and the deep tier can draw on different allowances.
    - **Still open:** which models each tier should use. Upstream's model picker doesn't list Haiku 5.5 or Sonnet 5.5 yet, but both can be set through config.
